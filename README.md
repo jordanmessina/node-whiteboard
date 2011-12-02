@@ -13,10 +13,12 @@ How to Run
 ----------
 
 You need to serve www/ from any web server. An easy way is to use the SimpleHTTPServer module built into python:
+
     cd www/
     python -m SimpleHTTPServer
 
 You also need to run the node server:
+
     cd node/
     node app.js
 
