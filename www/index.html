@@ -96,7 +96,7 @@
                         point1 = lastPoint; 
                         point2 = [e.pageX - canvasOffset[0], e.pageY - canvasOffset[1]];
                         drawStroke(point1, point2);
-                        sendDraw(point1, point2);
+                        socket.emit('draw-coords', {point1: point1, point2:point2});
                         lastPoint = point2;
                         
                     }
