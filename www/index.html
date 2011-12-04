@@ -4,29 +4,40 @@
         <script type="text/javascript" src="socket.io.js"></script>
         <script type="text/javascript">
             function init(){
-                /*
-                    init sets up all global variables and binds
-                    events to certain DOM elements
-                */
-
-                //global vars
-                var drawing_var = document.getElementById('drawing-area');
-                var draw = false;
-                var context = drawing_var.getContext("2d");
-                var last_point = [-1,-1];
-                //our socket
+        
+                var draw;
+                var lastPoint;
+                var canvas = setupCanvas();
+                var canvasOffset = canvasOffset();
                 var socket = io.connect('http://'+window.location.hostname+':8080');
 
-                //setup canvas context
-                context.strokeStyle = '#000000';
-                context.lineWidth = 5;
-                context.lineCap = 'round';
+               
+                function initStroke() {
+                    draw = false;
+                    lastPoint = [-1, -1];
+                }
+                
+                
+                function setupCanvas()  {
+                    var canvasElement = $('#drawing-area');
+                    var canvas =  canvasElement.getContext("2d");
+                    var oldWidth = canvasElement.width;
+                    
+                    canvasElement.width = 0;
+                    canvasElement.width = oldWidth;
+                    
+                    canvas.strokeStyle = '#000000';
+                    canvas.lineWidth = 5;
+                    canvas.lineCap = 'round';
+                    
+                    initStroke();
+                    
+                    return canvas;
+            
+                }
 
-                function ObjectPosition(obj) {
-                    /*
-                        determines the offset of an element on the screen
-                        returns pixels from the left and pixels from the top in an array
-                    */
+                //why is this needed?
+                function objectPosition(obj) {
                     var curleft = 0;
                       var curtop = 0;
                       if (obj.offsetParent) {
@@ -37,50 +48,38 @@
                       }
                       return [curleft,curtop];
                 };
+                
+                function canvasOffset()
+                {
+                    return objectPosition($('#drawing-area'));
+                }
 
-                function drawit(point1, point2, from_socket){
-                    /*
-                        uses global var context which is the canvas context('2d')
-                        point1 and point2 are arrays representing an x,y coordinate
-                        use the canvas to draw from point1 to point2
-                        if this is called from a socket, we do NOT broadcast the points
-                        that would lead to an endless call loop from server -> client -> server ahhhh
-                    */
-                    context.beginPath();
-                    context.moveTo(point1[0], point1[1]);
-                    context.lineTo(point2[0], point2[1]);
-                    context.stroke();
+                function drawStroke(point1, point2, from_socket){
+                    canvas.beginPath();
+                    canvas.moveTo(point1[0], point1[1]);
+                    canvas.lineTo(point2[0], point2[1]);
+                    canvas.stroke();
                     if(!from_socket){
                         socket.emit('draw-coords', {point1: point1, point2:point2});
                     }
                     return;
                 };
 
-                function clearit(from_socket){
-                    var temp = drawing_var.width;
-                    drawing_var.width = 0;
-                    drawing_var.width = temp;
-                    context = drawing_var.getContext("2d");
-                    context.strokeStyle = '#000000';
-                    context.lineWidth = 5;
-                    context.lineCap = 'round';
+                function clearCanvas(from_socket){
+                    canvas = setupCanvas();
                     if(!from_socket){
                         socket.emit('clear', {});
                     }
                     return;
                 };
 
-                //global variable draw_area_offset 
-                var draw_area_offset = ObjectPosition(drawing_var);
 
                 //attach events to the canvas
                 $('#drawing-area').mouseup(function(){
-                    draw = false;
-                    last_point = [-1, -1];
+                    initStroke();
                 });
                 $('#drawing-area').mouseleave(function(){
-                    draw = false;
-                    last_point = [-1, -1]
+                    initStroke();
                 });
                 $('#drawing-area').mousedown(function(e){
                     /*
@@ -90,10 +89,10 @@
                         first click
                     */
                     draw = true;
-                    point1 = [e.pageX - draw_area_offset[0], e.pageY - draw_area_offset[1]];
-                    point2 = [e.pageX - draw_area_offset[0]+1, e.pageY - draw_area_offset[1]];
-                    last_point = point1;
-                    drawit(point1, point2, false);
+                    point1 = [e.pageX - canvasOffset[0], e.pageY - canvasOffset[1]];
+                    point2 = [e.pageX - canvasOffset[0]+1, e.pageY - canvasOffset[1]];
+                    lastPoint = point1;
+                    drawStroke(point1, point2, false);
                 });
                 $('#drawing-area').mousemove(function(e){
                     /*
@@ -102,21 +101,21 @@
                         reset last_point to point2 after drawing
                     */
                     if(draw){
-                        point1 = last_point; 
-                        point2 = [e.pageX - draw_area_offset[0], e.pageY - draw_area_offset[1]];
-                        drawit(point1, point2, false);
-                        last_point = point2;
+                        point1 = lastPoint; 
+                        point2 = [e.pageX - canvasOffset[0], e.pageY - canvasOffset[1]];
+                        drawStroke(point1, point2, false);
+                        lastPoint = point2;
                     }
                 });
 
                 //make sure the offset is updated on a window resize
                 $(window).resize(function(){
-                    draw_area_offset = ObjectPosition(drawing_var);    
+                    draw_area_offset = canvasOffset();    
                 });
 
                 //clear canvas when 'clear' button is clicked
                 $('#clear-canvas').click(function(){
-                    clearit(false);
+                    clearCanvas(false);
                 });
 
                 //websocket event, receive data which contains 2 points
@@ -124,12 +123,12 @@
                 socket.on('draw', function(data){
                     point1 = [data['point1'][0], data['point1'][1]];
                     point2 = [data['point2'][0], data['point2'][1]];
-                    drawit(point1, point2, true);
+                    drawStroke(point1, point2, true);
                 });
 
                 //websocket event to clear the 
                 socket.on('clear', function(data){
-                    clearit(true);
+                    clearCanvas(true);
                 });
 
             }
