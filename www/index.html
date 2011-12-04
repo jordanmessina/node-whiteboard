@@ -15,10 +15,28 @@
                 var socket = io.connect('http://'+window.location.hostname+':8080');
 
 /////////// UTILITIES
-               
+
                 function initStroke() {
                     draw = false;
                     lastPoint = [-1, -1];
+                }
+                
+
+                //why is this needed?
+                function getPosition(obj) {
+                    var curleft = 0;
+                      var curtop = 0;
+                      if (obj.offsetParent) {
+                            do {
+                                  curleft += obj.offsetLeft;
+                                  curtop += obj.offsetTop;
+                            } while (obj = obj.offsetParent);
+                      }
+                      return [curleft,curtop];
+                }
+                
+                function canvasOffset()  {
+                    return getPosition($('#drawing-area'));
                 }
                 
                 
@@ -40,30 +58,12 @@
             
                 }
 
-                //why is this needed?
-                function getPosition(obj) {
-                    var curleft = 0;
-                      var curtop = 0;
-                      if (obj.offsetParent) {
-                            do {
-                                  curleft += obj.offsetLeft;
-                                  curtop += obj.offsetTop;
-                            } while (obj = obj.offsetParent);
-                      }
-                      return [curleft,curtop];
-                };
-                
-                function canvasOffset()
-                {
-                    return getPosition($('#drawing-area'));
-                }
-                
                 function draw(point1, point2){
                     canvas.beginPath();
                     canvas.moveTo(point1[0], point1[1]);
                     canvas.lineTo(point2[0], point2[1]);
                     canvas.stroke();
-                };
+                }
                 
 ///////////////// DOM EVENTS
 
