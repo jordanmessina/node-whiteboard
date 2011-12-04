@@ -8,6 +8,7 @@ node-whiteboard is the original implementation of whit537/pictionary, which was 
 Dependencies
 ------------
 socket.io
+
     cd node/
     npm install socket.io
 
