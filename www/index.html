@@ -67,15 +67,19 @@
                 
 ///////////////// DOM EVENTS
 
+                
+                $(window).resize(function(){
+                    canvasOffset = canvasOffset();    
+                });
+                
+////////////////// UI STOP PIANT EVENTS
+
+
                 $('#drawing-area').mouseup(function(){
                     initStroke();
                 });
                 $('#drawing-area').mouseleave(function(){
                     initStroke();
-                });
-                
-                $(window).resize(function(){
-                    canvasOffset = canvasOffset();    
                 });
 
 
