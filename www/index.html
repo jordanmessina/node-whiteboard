@@ -54,10 +54,6 @@
                     return objectPosition($('#drawing-area'));
                 }
                 
-                function sendDraw(point1, point2) {
-                    socket.emit('draw-coords', {point1: point1, point2:point2});
-                }
-
                 function drawStroke(point1, point2){
                     canvas.beginPath();
                     canvas.moveTo(point1[0], point1[1]);
@@ -65,15 +61,6 @@
                     canvas.stroke();
                 };
                 
-                function sendClear() {
-                    socket.emit('clear', {});
-                }
-
-                function clearCanvas(){
-                    canvas = setupCanvas();
-                };
-
-
                 //attach events to the canvas
                 $('#drawing-area').mouseup(function(){
                     initStroke();
@@ -93,7 +80,7 @@
                     point2 = [e.pageX - canvasOffset[0]+1, e.pageY - canvasOffset[1]];
                     lastPoint = point1;
                     drawStroke(point1, point2);
-                    sendDraw(point1, point2);
+                    socket.emit('draw-coords', {point1: point1, point2:point2});
                 });
                 $('#drawing-area').mousemove(function(e){
                     /*
@@ -116,8 +103,8 @@
                 });
 
                 $('#clear-canvas').click(function(){
-                    clearCanvas();
-                    sendClear();
+                    canvas = setupCanvas();
+                    socket.emit('clear', {});
                 });
 
                 //websocket event, receive data which contains 2 points
@@ -130,7 +117,7 @@
 
                 //websocket event to clear the 
                 socket.on('clear', function(data){
-                    clearCanvas();
+                    canvas = setupCanvas();
                 });
 
             }
