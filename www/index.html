@@ -11,7 +11,7 @@
                 var draw;
                 var lastPoint;
                 var canvas = clear();
-                var canvasOffset = canvasOffset();
+                var canvasOffset = getPosition($('#drawing-area'));
                 var socket = io.connect('http://'+window.location.hostname+':8080');
 
 /////////// UTILITIES
@@ -33,10 +33,6 @@
                             } while (obj = obj.offsetParent);
                       }
                       return [curleft,curtop];
-                }
-                
-                function canvasOffset()  {
-                    return getPosition($('#drawing-area'));
                 }
                 
                 
@@ -68,7 +64,7 @@
 ///////////////// DOM EVENTS
 
                 $(window).resize(function(){
-                    canvasOffset = canvasOffset();    
+                    canvasOffset = getPosition($('#drawing-area'));
                 });
                 
 ////////////////// UI STOP PAINT EVENTS
