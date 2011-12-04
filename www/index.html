@@ -21,7 +21,6 @@
                     lastPoint = [-1, -1];
                 }
                 
-
                 //why is this needed?
                 function getPosition(obj) {
                     var curleft = 0;
@@ -34,7 +33,6 @@
                       }
                       return [curleft,curtop];
                 }
-                
                 
                 function clear()  {
                     var canvasElement = $('#drawing-area');
@@ -72,10 +70,10 @@
                 $('#drawing-area').mouseup(function(){
                     initStroke();
                 });
+                
                 $('#drawing-area').mouseleave(function(){
                     initStroke();
                 });
-
 
 /////////////////// UI START PAINT EVENT
 
