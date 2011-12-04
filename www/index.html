@@ -10,7 +10,7 @@
         
                 var draw;
                 var lastPoint;
-                var canvas = setupCanvas();
+                var canvas = clear();
                 var canvasOffset = canvasOffset();
                 var socket = io.connect('http://'+window.location.hostname+':8080');
 
@@ -22,7 +22,7 @@
                 }
                 
                 
-                function setupCanvas()  {
+                function clear()  {
                     var canvasElement = $('#drawing-area');
                     var canvas =  canvasElement.getContext("2d");
                     var oldWidth = canvasElement.width;
@@ -41,7 +41,7 @@
                 }
 
                 //why is this needed?
-                function objectPosition(obj) {
+                function getPosition(obj) {
                     var curleft = 0;
                       var curtop = 0;
                       if (obj.offsetParent) {
@@ -55,10 +55,10 @@
                 
                 function canvasOffset()
                 {
-                    return objectPosition($('#drawing-area'));
+                    return getPosition($('#drawing-area'));
                 }
                 
-                function drawStroke(point1, point2){
+                function draw(point1, point2){
                     canvas.beginPath();
                     canvas.moveTo(point1[0], point1[1]);
                     canvas.lineTo(point2[0], point2[1]);
@@ -92,7 +92,7 @@
                     var point1 = [e.pageX - canvasOffset[0], e.pageY - canvasOffset[1]];
                     var point2 = [e.pageX - canvasOffset[0]+1, e.pageY - canvasOffset[1]];
                     lastPoint = point1;
-                    drawStroke(point1, point2);
+                    draw(point1, point2);
                     socket.emit('draw-coords', {point1: point1, point2:point2});
                 });
                 
@@ -107,7 +107,7 @@
                     if(draw){
                         var point1 = lastPoint; 
                         var point2 = [e.pageX - canvasOffset[0], e.pageY - canvasOffset[1]];
-                        drawStroke(point1, point2);
+                        draw(point1, point2);
                         socket.emit('draw-coords', {point1: point1, point2:point2});
                         lastPoint = point2;
                         
@@ -117,7 +117,7 @@
 ///////////////// UI CLEAR EVENT 
 
                 $('#clear-canvas').click(function(){
-                    canvas = setupCanvas();
+                    canvas = clear();
                     socket.emit('clear', {});
                 });
 
@@ -127,12 +127,12 @@
                 socket.on('draw', function(data){
                     var point1 = [data['point1'][0], data['point1'][1]];
                     var point2 = [data['point2'][0], data['point2'][1]];
-                    drawStroke(point1, point2);
+                    draw(point1, point2);
                 });
 
                 //websocket event to clear the 
                 socket.on('clear', function(data){
-                    canvas = setupCanvas();
+                    canvas = clear();
                 });
 
             }
