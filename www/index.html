@@ -76,6 +76,10 @@
                         first click
                     */
                     draw = true;
+                    //wtf an actual GLOBAL var for this? var point1...
+                    // will need to declare these vars at function scope unless theres 
+                    //voodoo in here
+                    
                     point1 = [e.pageX - canvasOffset[0], e.pageY - canvasOffset[1]];
                     point2 = [e.pageX - canvasOffset[0]+1, e.pageY - canvasOffset[1]];
                     lastPoint = point1;
