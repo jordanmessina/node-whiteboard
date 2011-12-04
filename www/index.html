@@ -102,7 +102,7 @@
 
                 $('#drawing-area').mousemove(function(e){
                     /*
-                        we use the last_point for point1 (set with mousedown event)
+                        we use the lastPoint for point1 (set with mousedown event)
                         point2 is set from event e x,y coord
                         reset last_point to point2 after drawing
                     */
@@ -131,7 +131,6 @@
                     draw(point1, point2);
                 });
 
-                //websocket event to clear the 
                 socket.on('clear', function(data){
                     canvas = clear();
                 });
