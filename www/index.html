@@ -15,7 +15,7 @@
 
 /////////// UTILITIES
 
-                function initStroke() {
+                function stopDrawing() {
                     draw = false;
                     lastPoint = [-1, -1];
                 }
@@ -45,7 +45,7 @@
                     canvas.lineWidth = 5;
                     canvas.lineCap = 'round';
                     
-                    initStroke();
+                    stopDrawing();
                     
                     return canvas;
             
@@ -67,11 +67,11 @@
 ////////////////// UI STOP PAINT EVENTS
 
                 $('#drawing-area').mouseup(function(){
-                    initStroke();
+                    stopDrawing();
                 });
                 
                 $('#drawing-area').mouseleave(function(){
-                    initStroke();
+                    stopDrawing();
                 });
 
 /////////////////// UI START PAINT EVENT
