@@ -10,7 +10,7 @@
                 var draw;
                 var lastPoint;
                 var canvas = clear();
-                var canvasOffset = getPosition($('#drawing-area'));
+                var canvasOffset = getPosition(canvas);
                 var socket = io.connect('http://'+window.location.hostname+':8080');
 
 /////////// UTILITIES
@@ -34,7 +34,7 @@
                 }
                 
                 function clear()  {
-                    var canvasElement = $('#drawing-area');
+                    var canvasElement = $('#drawing-area')[0];
                     var canvas =  canvasElement.getContext("2d");
                     var oldWidth = canvasElement.width;
                     
@@ -50,7 +50,7 @@
                     return canvas;
                 }
 
-                function draw(point1, point2){
+                function draw_line(point1, point2){
                     canvas.beginPath();
                     canvas.moveTo(point1[0], point1[1]);
                     canvas.lineTo(point2[0], point2[1]);
@@ -60,7 +60,7 @@
 ///////////////// DOM EVENTS
 
                 $(window).resize(function(){
-                    canvasOffset = getPosition($('#drawing-area'));
+                    canvasOffset = getPosition(canvas);
                 });
                 
 ////////////////// UI STOP PAINT EVENTS
@@ -86,7 +86,7 @@
                     var point1 = [e.pageX - canvasOffset[0], e.pageY - canvasOffset[1]];
                     var point2 = [e.pageX - canvasOffset[0]+1, e.pageY - canvasOffset[1]];
                     lastPoint = point1;
-                    draw(point1, point2);
+                    draw_line(point1, point2);
                     socket.emit('draw-coords', {point1: point1, point2:point2});
                 });
                 
@@ -101,7 +101,7 @@
                     if(draw){
                         var point1 = lastPoint; 
                         var point2 = [e.pageX - canvasOffset[0], e.pageY - canvasOffset[1]];
-                        draw(point1, point2);
+                        draw_line(point1, point2);
                         socket.emit('draw-coords', {point1: point1, point2:point2});
                         lastPoint = point2;
                         
@@ -120,7 +120,7 @@
                 socket.on('draw', function(data){
                     var point1 = [data['point1'][0], data['point1'][1]];
                     var point2 = [data['point2'][0], data['point2'][1]];
-                    draw(point1, point2);
+                    draw_line(point1, point2);
                 });
 
                 socket.on('clear', function(data){
@@ -145,3 +145,4 @@
         </div>
     </body>
 </html>
+
