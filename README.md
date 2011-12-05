@@ -9,6 +9,9 @@ Dependencies
 ------------
 socket.io
 
+    cd node/
+    npm install socket.io
+
 How to Run
 ----------
 
