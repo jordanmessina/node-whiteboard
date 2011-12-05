@@ -10,7 +10,9 @@
                 var draw;
                 var lastPoint;
                 var canvas = clear();
-                var canvasOffset = getPosition(canvas);
+                //NOTE - jQuery's id selector WONT work for this...
+                var canvasOffset = getPosition(document.getElementById('drawing-area'));
+                alert(canvasOffset);
                 var socket = io.connect('http://'+window.location.hostname+':8080');
 
 /////////// UTILITIES
@@ -34,6 +36,7 @@
                 }
                 
                 function clear()  {
+                    //NOTE - jQuery's id selector returns a jQuery obj, NOT a canvas context
                     var canvasElement = $('#drawing-area')[0];
                     var canvas =  canvasElement.getContext("2d");
                     var oldWidth = canvasElement.width;
