@@ -12,7 +12,6 @@
                 var canvas = clear();
                 //NOTE - jQuery's id selector WONT work for this...
                 var canvasOffset = getPosition(document.getElementById('drawing-area'));
-                alert(canvasOffset);
                 var socket = io.connect('http://'+window.location.hostname+':8080');
 
 /////////// UTILITIES
