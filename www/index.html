@@ -62,7 +62,7 @@
 ///////////////// DOM EVENTS
 
                 $(window).resize(function(){
-                    canvasOffset = getPosition(canvas);
+                    canvasOffset = getPosition(document.getElementById('drawing-area'));
                 });
                 
 ////////////////// UI STOP PAINT EVENTS
