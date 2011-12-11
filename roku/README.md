@@ -11,8 +11,12 @@ your environment to the IP address of your Roku box.
 - Modify rhiteboard/source/appMain.brs var 'nodeServerIP' to your 
 Node Server IP. For example:
 
+
     nodeServerIP = "192.168.1.2:8080"
+
 
 - Install the Rhiteboard app on your Roku
 
+
     make install
+
