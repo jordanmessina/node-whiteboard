@@ -39,7 +39,7 @@ sub Main()
   remote = CreateObject("roUrlTransfer")
 
   ' example "192.168.1.2:8080"
-  nodeServerIP = "INSERT YOUR NODE SERVER IP HERE"
+  nodeServerIP = "192.168.1.2:8080"
 
   ' create our canvas
   canvas = CreateObject("roImageCanvas")
