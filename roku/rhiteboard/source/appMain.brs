@@ -36,24 +36,21 @@ sub Main()
   ' globals
   time = CreateObject("roDateTime")
   remote = CreateObject("roUrlTransfer")
-  port = CreateObject("roMessagePort")
 
   ' example "192.168.1.2:8080"
   nodeServerIP = "192.168.1.2:8080"
 
-  ' create our canvas
+  ' create our roScreen
   canvas = CreateObject("roScreen")
   canvas.Clear(&hFFFFFFFF)
   canvas.SetAlphaEnable(true)
 
 
-  remote.SetPort(port)
   remote.SetUrl("http://" + nodeServerIP + "/socket.io/1/xhr-polling/")
   result = remote.GetToString()
   session_id = left(result, Instr(1, result, ":")-1)
    
   while true
-      'do shit here
       remote.SetUrl("http://" + nodeServerIP + "/socket.io/1/xhr-polling/"+session_id+"?t="+STR(time.asSeconds()*100))
       response = remote.GetToString()
       points = FindAllPoints("\[([0-9]{1,3}),([0-9]{1,3})\]", response, "")
