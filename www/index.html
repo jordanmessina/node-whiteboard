@@ -38,6 +38,10 @@
                     canvas.stroke();
                 }
                 
+                function resizeCanvas() {
+                    canvasOffset = getPosition(document.getElementById('drawing-area'));
+                }
+                
                 function stopDrawing() {
                     draw = false;
                     lastPoint = [-1, -1];
@@ -100,7 +104,7 @@
 /////////////////  DOM EVENTS 
 
                 $(window).resize(function(){
-                    canvasOffset = getPosition(document.getElementById('drawing-area'));
+                    resizeCanvas();
                 });
 
                 $('#drawing-area').mouseup(function(){
