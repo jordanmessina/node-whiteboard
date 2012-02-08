@@ -9,18 +9,15 @@
             function init(){
                 var draw;
                 var lastPoint;
-                var canvas = clear();
+                var canvas;
+                
+                clear();
                 //NOTE - jQuery's id selector WONT work for this...
                 var canvasOffset = getPosition(document.getElementById('drawing-area'));
                 var socket = io.connect('http://'+window.location.hostname+':8080');
 
-/////////// UTILITIES
+/////////// APP
 
-                function stopDrawing() {
-                    draw = false;
-                    lastPoint = [-1, -1];
-                }
-                
                 //why is this needed?
                 function getPosition(obj) {
                     var curleft = 0;
@@ -34,10 +31,26 @@
                       return [curleft,curtop];
                 }
                 
+                function drawLine(point1, point2){
+                    canvas.beginPath();
+                    canvas.moveTo(point1[0], point1[1]);
+                    canvas.lineTo(point2[0], point2[1]);
+                    canvas.stroke();
+                }
+                
+                function resizeCanvas() {
+                    canvasOffset = getPosition(document.getElementById('drawing-area'));
+                }
+                
+                function stopDrawing() {
+                    draw = false;
+                    lastPoint = [-1, -1];
+                }
+                
                 function clear()  {
                     //NOTE - jQuery's id selector returns a jQuery obj, NOT a canvas context
                     var canvasElement = $('#drawing-area')[0];
-                    var canvas =  canvasElement.getContext("2d");
+                    canvas =  canvasElement.getContext("2d");
                     var oldWidth = canvasElement.width;
                     
                     canvasElement.width = 0;
@@ -49,35 +62,9 @@
                     
                     stopDrawing();
                     
-                    return canvas;
                 }
 
-                function draw_line(point1, point2){
-                    canvas.beginPath();
-                    canvas.moveTo(point1[0], point1[1]);
-                    canvas.lineTo(point2[0], point2[1]);
-                    canvas.stroke();
-                }
-                
-///////////////// DOM EVENTS
-
-                $(window).resize(function(){
-                    canvasOffset = getPosition(document.getElementById('drawing-area'));
-                });
-                
-////////////////// UI STOP PAINT EVENTS
-
-                $('#drawing-area').mouseup(function(){
-                    stopDrawing();
-                });
-                
-                $('#drawing-area').mouseleave(function(){
-                    stopDrawing();
-                });
-
-/////////////////// UI START PAINT EVENT
-
-                $('#drawing-area').mousedown(function(e){
+                function startDrawing(e) {
                     /*
                         event to initialize drawing. Grab the x,y coords from the event
                         for point2 we add 1px to x so there is a diff between the points
@@ -88,14 +75,12 @@
                     var point1 = [e.pageX - canvasOffset[0], e.pageY - canvasOffset[1]];
                     var point2 = [e.pageX - canvasOffset[0]+1, e.pageY - canvasOffset[1]];
                     lastPoint = point1;
-                    draw_line(point1, point2);
+                    drawLine(point1, point2);
                     socket.emit('draw-coords', {point1: point1, point2:point2});
-                });
+                }
                 
-/////////////////// UI PAINT EVENT
-
-                $('#drawing-area').mousemove(function(e){
-                    /*
+                function draw(e) {
+                     /*
                         we use the lastPoint for point1 (set with mousedown event)
                         point2 is set from event e x,y coord
                         reset last_point to point2 after drawing
@@ -103,30 +88,55 @@
                     if(draw){
                         var point1 = lastPoint; 
                         var point2 = [e.pageX - canvasOffset[0], e.pageY - canvasOffset[1]];
-                        draw_line(point1, point2);
+                        drawLine(point1, point2);
                         socket.emit('draw-coords', {point1: point1, point2:point2});
                         lastPoint = point2;
                         
                     }
+                }
+                
+                function drawFromNetwork(data) {
+                    var point1 = [data['point1'][0], data['point1'][1]];
+                    var point2 = [data['point2'][0], data['point2'][1]];
+                    drawLine(point1, point2);
+                }
+                
+/////////////////  DOM EVENTS 
+
+                $(window).resize(function(){
+                    resizeCanvas();
+                });
+
+                $('#drawing-area').mouseup(function(){
+                    stopDrawing();
                 });
                 
-///////////////// UI CLEAR EVENT 
+                $('#drawing-area').mouseleave(function(){
+                    stopDrawing();
+                });
+
+                $('#drawing-area').mousedown(function(e){
+                    startDrawing(e);
+                });
+                
+
+                $('#drawing-area').mousemove(function(e){
+                    draw(e);
+                });
 
                 $('#clear-canvas').click(function(){
-                    canvas = clear();
+                    clear();
                     socket.emit('clear', {});
                 });
 
 /////////////// IO EVENTS
 
                 socket.on('draw', function(data){
-                    var point1 = [data['point1'][0], data['point1'][1]];
-                    var point2 = [data['point2'][0], data['point2'][1]];
-                    draw_line(point1, point2);
+                    drawFromNetwork(data)
                 });
 
                 socket.on('clear', function(data){
-                    canvas = clear();
+                    clear();
                 });
 
             }
